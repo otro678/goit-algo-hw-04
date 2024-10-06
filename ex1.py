@@ -43,34 +43,39 @@ def insertion_sort(arr):
 def timsort(arr):
     return sorted(arr)
 
+def create_half_sorted_array(size):
+    half = size // 2
+    return sorted([random.randint(0, size) for _ in range(half)]) + [random.randint(0, size) for _ in range(size - half)]
+
+def create_nearly_sorted_array(size):
+    arr = sorted([random.randint(0, size) for _ in range(size)])
+    swap_count = max(1, size // 10)  # 10% елементів не на своєму місці
+    for _ in range(swap_count):
+        i, j = random.sample(range(size), 2)
+        arr[i], arr[j] = arr[j], arr[i]
+    return arr
+
 def compare_sorting_algorithms():
-    sizes = [100, 1000, 5000, 10000]
-    results = {}
+    sizes = [10, 100, 1000]
 
     for size in sizes:
         print(f"\nРозмір масиву: {size}")
         
-        random_data = [random.randint(0, size) for _ in range(size)]
-        sorted_data = sorted(random_data)
-        reversed_data = sorted(random_data, reverse=True)
+        unsorted_data = [random.randint(0, size) for _ in range(size)]
+        half_sorted_data = create_half_sorted_array(size)
+        nearly_sorted_data = create_nearly_sorted_array(size)
 
-        random_data = [random.randint(0, size) for _ in range(size)]
-        
-        merge_time = timeit.timeit(lambda: merge_sort(random_data[:]), number=1)
-        print(f"Merge Sort (випадкові дані): {merge_time:.6f} секунд")
+        for data_type, data in [('Несортований', unsorted_data), ('Напівсортований', half_sorted_data), ('Майже відсортований', nearly_sorted_data)]:
+            print(f"\nТип даних: {data_type}")
+            
+            merge_time = timeit.timeit(lambda: merge_sort(data[:]), number=1)
+            print(f"Merge Sort: {merge_time:.6f} секунд")
 
-        insertion_time = timeit.timeit(lambda: insertion_sort(random_data[:]), number=1)
-        print(f"Insertion Sort (випадкові дані): {insertion_time:.6f} секунд")
+            insertion_time = timeit.timeit(lambda: insertion_sort(data[:]), number=1)
+            print(f"Insertion Sort: {insertion_time:.6f} секунд")
 
-        timsort_time = timeit.timeit(lambda: timsort(random_data[:]), number=1)
-        print(f"Timsort (випадкові дані): {timsort_time:.6f} секунд")
+            timsort_time = timeit.timeit(lambda: timsort(data[:]), number=1)
+            print(f"Timsort: {timsort_time:.6f} секунд")
+            print("===================================")
 
-        results[size] = {
-            'merge_sort': merge_time,
-            'insertion_sort': insertion_time,
-            'timsort': timsort_time
-        }
-
-    return results
-
-results = compare_sorting_algorithms()
+compare_sorting_algorithms()
